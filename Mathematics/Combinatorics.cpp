@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-#define MOD int(1e9) + 7 
+#define MOD 1000000007
 
 using namespace std;
 
