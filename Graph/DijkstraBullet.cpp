@@ -1,80 +1,58 @@
 #include <bits/stdc++.h>
-#define MAXN 500005
-#define di pair<int, int>
-#define tri pair<int, di>
-#define ll long long
-#define tlii pair<ll, di >
+#define MAX 200001
+#define pii pair<int, int>
+#define LL long long
+#define tlii pair<LL, pii>
+#define INF 2e18
 
 using namespace std;
 
-vector<di> matrix[MAXN];
-bool seen[MAXN];
-int parents[2 * MAXN];
+vector<int> result;
+vector<tlii> matrix[MAX];
+vector<LL> dists(MAX,  INF);
+int n;
+struct  compare
+{
+    bool operator()(tlii A, tlii B){return A.first > B.first;}
+};
 
-struct compare{bool operator()(tlii A, tlii B){return A.first > B.first;}};
-
-int dijkstra(int v0,int v1){
+void dijkistra(){
     priority_queue<tlii, vector<tlii>, compare> pq;
-    pq.push({0,{v0, 0}});
-    if(v0 == v1) return 1;
-    
+    pq.push({0, {1, 0}});
+    tlii top;
+    dists[1] = 0;
     while(! pq.empty()){
-        tlii top = pq.top();
+        top = pq.top();
         pq.pop();
-
         int node = top.second.first;
-        int path = top.second.second;
-        ll distance = top.first;
-        
-        if(seen[node])
+        LL dist = top.first;
+        int aresta = top.second.second;
+        if(dist != dists[node] )
             continue;
-        
-        parents[node] = path; 
-        
-        if(node == v1)
-            return node;
-
-        seen[node] = true;
-        for(int i = 0; i < matrix[node].size(); i++){
-            int v = matrix[node][i].first;
-            if(! seen[v])
-                pq.push({distance + matrix[node][i].second, {v, node}});
+        result.push_back(aresta);
+        for(int i =0; i < matrix[node].size(); i++){
+            int v = matrix[node][i].second.first;
+            LL distv = matrix[node][i].first;
+            if(dist + distv < dists[v]){
+                dists[v] = dist + distv;
+                pq.push({dists[v], {v, matrix[node][i].second.second}});
+            }
         }
     }
-    return 0;
 }
 
 int main(){
-    
-    ios_base::sync_with_stdio(false);
-    cout.tie(NULL);
-    cin.tie(NULL);
-    int nNodes, mEdges;    
-    cin >> nNodes >> mEdges;
+    ios::sync_with_stdio(0);
 
-    int a, b, c;
-    for(int k = 0; k < mEdges; k++){
+    int m, a, b, c;
+    cin >> n >> m;
+    for(int i = 0; i < m; i++){
         cin >> a >> b >> c;
-        matrix[a].push_back({b, c});
-        matrix[b].push_back({a, c});
+        matrix[a].push_back({c, {b, i+1}});
+        matrix[b].push_back({c, {a, i+1}});
     }
-    int result = dijkstra(1, nNodes);
-    if( result ==  0)
-        cout << "there is no way possible!";
-    else if(result == 1)
-        cout << 1;
-    else{
-        vector<int> output;
-        output.push_back(result);
-        int i = result;
-        while(parents[result]){ 
-            result = parents[result];
-            output.push_back(result);
-        }
-
-        for(int i = output.size() - 1; i >= 0; i--){
-            cout << output[i] << " ";
-        }
+    dijkistra();
+    for(int i = 1; i < n; i++){
+        cout << result[i] << " ";
     }
-    return 0;
 }
